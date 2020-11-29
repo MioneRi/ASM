@@ -1,0 +1,9 @@
+******NOTE : All programs work only in MS DOS (really old OS ^_^ ) !
+
+Lab1: (*Don't remember sorry ^_^ )
+
+Lab2.1: User inputs number1 and number2, result of dividing will print in console.
+
+Lab2.2: The same as Lab2.1 but now program could also process keys : esc(or delete) and bcspace.
+
+Lab3: The same as Lab2.2 but for signed numbers. (and now decimal part will desplay well)

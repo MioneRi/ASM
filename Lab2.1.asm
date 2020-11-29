@@ -39,6 +39,17 @@ main:
 	MOV cx,10
 	MOV dx,0
 	MUL cx
+	
+	PUSH ax // Пушим если вдруг будет переполнение чтоб не потерять значение.
+	
+	// Если было переполнение.
+	JNC jump2
+		
+		MOV dx,0
+		MOV ax,bx // То на что делили, делим на 10.
+	
+	jump2:	
+	POP ax
 	MOV dx,0
 	DIV bx
 	CALL PrintNum ; Выводим остаток.

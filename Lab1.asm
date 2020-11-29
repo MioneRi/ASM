@@ -36,11 +36,13 @@ main:
 		; Prepare for condition.
 		MOV bx,a
 		ADD bx,b ; a(bx) + b
+		JC ifNotEquals2
+		
 		MOV cx,c
 		XOR cx,d ; c(cx) ^ d	
 		
 		; Comprehension 2.
-		CMP bx,cx
+		CMP bx,cx		
 		JNE ifNotEquals2
 			; If equals.
 			MOV ax,a
@@ -62,7 +64,7 @@ main:
 	
 	L2:
 	
-	MOV ax,4c00h
+	MOV ax,4c00h0
 	INT 21h ; Делаем прерывание процессора.
 	
 	; Here i'll write some functions:
