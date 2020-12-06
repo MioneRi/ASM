@@ -35,23 +35,39 @@ main:
 	LEA cx,dot1	
 	CALL PrintStr ; Печатаем точку (dot1).
 	
+	; dx - остаток, bx - делитель
+	PUSH dx
 	MOV ax,dx
 	MOV cx,10
 	MOV dx,0
-	MUL cx
 	
-	PUSH ax // Пушим если вдруг будет переполнение чтоб не потерять значение.
-	
-	// Если было переполнение.
-	JNC jump2
-		
+	MUL cx ; пробуем умножить и смотрим будет ли переполнение.
+	JC wasoverflow1
+		; Если не было. 
+		POP dx
+		MOV ax,dx	
+		MOV cx,10
 		MOV dx,0
-		MOV ax,bx // То на что делили, делим на 10.
+		MUL cx	
+		JMP endMark1
+		
+	wasoverflow1: ; если было переполнение.
+		POP dx
+		MOV ax,bx ; Меняем значение делителя на меньшее в 10 раз.
+		MOV cx,10
+		PUSH dx
+		MOV dx,0
+		DIV cx ; Теперь ax - хранит делитель в 10 раз меньший.
+		MOV bx,ax
+		
+		POP dx
+		MOV ax,dx
+		
+	endMark1:
 	
-	jump2:	
-	POP ax
-	MOV dx,0
+	CWD
 	DIV bx
+	
 	CALL PrintNum ; Выводим остаток.
 	
 	MOV ax,4c00h

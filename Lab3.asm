@@ -8,6 +8,7 @@
 	dot1 db ".$"
 	stack1 dw ?
 	arg1 dw ?
+	minus1 db "-$"
 .code
 .386
 
@@ -16,6 +17,7 @@ main:
 	MOV ds,ax					
 	
 	; -----------------------------------------------------------------------------	
+	Begin2:
 	
 	CALL InputNum ; Input num1.
 	PUSH ax ; Save num1.
@@ -26,46 +28,117 @@ main:
 	JNE L2
 	
 	CALL TryProc
-	JMP L1
+	JMP L1 ; Checking loop (p.s. num2 cannot be 0)
 	
 	L2: ; Now input is correct.
 	MOV bx,ax ; bx = num2.
 	POP ax ; ax = num1.
 	
-	CMP ax,0
-	JNL kek1
+	; Проверка на -32 768 и -1.
+	CMP ax,-32768
+	JNE lol1
+	CMP bx,-1
+	JNE lol1
+	
+	CALL TryProc
+	JMP Begin2
+	
+	lol1: ; Конец проверки на -32 768 и -1.
+	
+	CMP ax,0 ; Проверяем знак.
+	JNL kek1 ; Переход если ax >= 0.
 		MOV dx,0ffffh
 		JMP kek2
 	kek1:
 		MOV dx,0 ; Обнуляем dx т.к. может возникнуть переполнение и будет оошибка как при делении на ноль!
 		
-	kek2:
-	IDIV bx ; ax = ax/bx ; 
+	kek2: ; Теперь регистр dx готов.
 	
-	CALL PrintNum ; Целая часть
-	LEA cx,dot1	
-	CALL PrintStr ; Печатаем точку (dot1).
+	IDIV bx ; ax = ax/bx ;
 	
-	CMP ax,0
-	JNL kek3
-		; - Остаток после деления переводим в положительный эквивалент. (меняем dx)
-		
-		MOV ax,dx
-		MOV dx,0ffffh
-		SUB dx,ax
-		INC dx
-				
+	PUSH ax ; сохраняем целую часть.
+	
+	;CALL PrintNum ; Целая часть
+	;LEA cx,dot1
+	;CALL PrintStr ; Печатаем точку (dot1).
+	
+	
+	; А что если делать всё с негативными штуками.	
+	; Сохранил часть кода отсюда в ex.asm ...	
+	; А что если делать всё с негативными штуками.
+	
 	kek3:
+		
+		; dx - остаток, bx - делитель
+		PUSH dx
 		MOV ax,dx
 		MOV cx,10
-		MOV dx,0
-		MUL cx
-		MOV dx,0
-		DIV bx		
+		CWD ; MOV dx,0...........
+		
+		; было mul............
+		IMUL cx ; пробуем умножить и смотрим будет ли переполнение.
+		JC wasoverflow1
+			; Если не было. 
+			POP dx
+			MOV ax,dx	
+			MOV cx,10
+			CWD ; MOV dx,0 ...........
+			IMUL cx	; было MUL ...........
+			JMP endMark2
+			
+		wasoverflow1: ; если было переполнение.
+			POP dx
+			MOV ax,bx ; Меняем значение делителя на меньшее в 10 раз.
+			MOV cx,10
+			PUSH dx
+			CWD ; MOV dx,0 ...........
+			IDIV cx ; Теперь ax - хранит делитель в 10 раз меньший............
+			MOV bx,ax
+			
+			POP dx
+			MOV ax,dx
+			
+		endMark2:
+		
+		CWD ; MOV dx,0 ...........
+		IDIV bx ; ...........
 	
 	kek4:
-	
-		CALL PrintNum ; Выводим остаток.
+		
+		MOV bx,ax ; bx - результат после точки.
+		POP ax ; ax - целая часть.
+			
+		CMP bx,0 ; смотрим знак результата после точки.
+		JNL end4
+			; Рассматриваем два случая: если целая часть была >= 0 и если она была отрицательная.										
+			; 1) если целая часть ax >= 0 
+			CMP ax,0
+			JL case2					
+				LEA cx,minus1 
+				CALL PrintStr ; печатаем минус.
+				CALL PrintNum ; печатаем целую часть.
+				LEA cx,dot1 
+				CALL PrintStr ; печатаем точку.
+				NEG bx ; в положительное.
+				MOV ax,bx
+				
+				JMP end5
+			case2: ; 2) если целая часть ax < 0 			
+				CALL PrintNum ; печатаем целую часть.
+				LEA cx,dot1 
+				CALL PrintStr ; печатаем точку.
+				NEG bx
+				MOV ax,bx
+				
+				JMP end5			
+		end4:
+			CALL PrintNum ; печатаем целую часть.
+			LEA cx,dot1
+			CALL PrintStr ; печатаем точку.
+			MOV ax,bx
+			
+		end5:		
+			CALL PrintNum ; Выводим остаток.
 	; -----------------------------------------------------------------------------
 	
 	MOV ax,4c00h
