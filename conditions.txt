@@ -11,3 +11,5 @@ Lab3: The same as Lab2.2 but for signed numbers. (and now decimal part will desp
 Lab4: User inputs a string (example: "tat qwtatf")
 	Program checks if str2(after space) contains str1(before space)
 	and outputs "yes" or "no".
+
+Lab5: Floyd's algorithm.

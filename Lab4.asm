@@ -139,9 +139,8 @@ main:
 		ret
 	endp
 	
-	;*
-	; near - значит что эта процедура будет вызываться в этом же сигменте.
-	PrintStr proc c near
+	;*	
+	PrintStr proc c near ; near - значит что эта процедура будет вызываться в этом же сигменте.
 	arg ourStr:word
 	uses ax,dx
 		MOV dx,ourStr
