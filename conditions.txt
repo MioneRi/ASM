@@ -6,7 +6,7 @@ Lab2.1: User inputs number1 and number2, result of dividing will print in consol
 
 Lab2.2: The same as Lab2.1 but now program could also process keys : esc(or delete) and bcspace.
 
-Lab3: The same as Lab2.2 but for signed numbers. (and now decimal part will desplay well)
+Lab3: The same as Lab2.2 but for signed numbers. (and now decimal part will display well)
 
 Lab4: User inputs a string (example: "tat qwtatf")
 	Program checks if str2(after space) contains str1(before space)
